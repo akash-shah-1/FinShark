@@ -1,57 +1,34 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using api.Models;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using api.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using System.Data.SqlTypes;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using System.Reflection.Metadata;
 
 namespace api.Data
 {
-    public class ApplicationDBContext : IdentityDbContext<AppUser>
+    public class ApplicationDBContext : DbContext
+    //a DbContext is the primary class that interacts with the database.It manages the entity objects during runtime,
+    //which includes retrieving them from the database, keeping track of changes, and persisting data back to the database.
     {
-        public ApplicationDBContext(DbContextOptions dbContextOptions)
-        : base(dbContextOptions)
+        //Constructor
+        public ApplicationDBContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
+        //DbContextOptions is a class provided by Entity Framework Core.
+        //It encapsulates configuration information needed to set up the DbContext.This includes details
+        //like the database provider (e.g., SQL Server, SQLite), connection strings, and other options.
+
+        //The : base(dbContextOptions) syntax is a call to the base class (DbContext) constructor.
+        //It passes the dbContextOptions parameter to the base class constructor, ensuring that the DbContext is properly initialized with the provided options.
         {
-
         }
+        public DbSet<Stock> Stock {get;set;}
+        public DbSet<Comment> Comment { get;set;}
 
-        public DbSet<Stock> Stocks { get; set; }
-        public DbSet<Comment> Comments { get; set; }
-        public DbSet<Portfolio> Portfolios { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder builder)
-        {
-            base.OnModelCreating(builder);
-
-            builder.Entity<Portfolio>(x => x.HasKey(p => new { p.AppUserId, p.StockId }));
-
-            builder.Entity<Portfolio>()
-                .HasOne(u => u.AppUser)
-                .WithMany(u => u.Portfolios)
-                .HasForeignKey(p => p.AppUserId);
-
-            builder.Entity<Portfolio>()
-                .HasOne(u => u.Stock)
-                .WithMany(u => u.Portfolios)
-                .HasForeignKey(p => p.StockId);
+        //By defining a DbSet<T>, you are telling Entity Framework Core that you want to be able to query and save instances of Stock and Comment.
 
 
-            List<IdentityRole> roles = new List<IdentityRole>
-            {
-                new IdentityRole
-                {
-                    Name = "Admin",
-                    NormalizedName = "ADMIN"
-                },
-                new IdentityRole
-                {
-                    Name = "User",
-                    NormalizedName = "USER"
-                },
-            };
-            builder.Entity<IdentityRole>().HasData(roles);
-        }
     }
 }
