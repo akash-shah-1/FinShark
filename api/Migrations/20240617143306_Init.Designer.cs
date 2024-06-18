@@ -12,7 +12,7 @@ using api.Data;
 namespace api.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20240614124943_Init")]
+    [Migration("20240617143306_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -66,6 +66,16 @@ namespace api.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Industry")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("LastDiv")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<long>("MarketCap")
+                        .HasColumnType("bigint");
+
                     b.Property<decimal>("Purchase")
                         .HasColumnType("decimal(18,2)");
 
@@ -81,10 +91,15 @@ namespace api.Migrations
             modelBuilder.Entity("api.Models.Comment", b =>
                 {
                     b.HasOne("api.Models.Stock", "Stock")
-                        .WithMany()
+                        .WithMany("Comments")
                         .HasForeignKey("StockId");
 
                     b.Navigation("Stock");
+                });
+
+            modelBuilder.Entity("api.Models.Stock", b =>
+                {
+                    b.Navigation("Comments");
                 });
 #pragma warning restore 612, 618
         }
